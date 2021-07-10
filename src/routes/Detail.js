@@ -1,3 +1,28 @@
+/* eslint-disable import/no-anonymous-default-export */
 import React from "react";
+import { useParams } from "react-router-dom";
+import { gql } from "apollo-boost";
 
-export default () => <h1>Detail</h1>;
+
+const GET_MOVIES = gql `
+    query getMovie($id: Int!) {
+        movie(id: $id) {
+            id
+            title
+            medium_cover_image
+            description_intro
+        }
+    }
+`;
+
+
+export default () => {
+    const { id } = useParams();
+    const { loading, data } = useQuery(GET_MOVIES, {variables: {id}});
+    if(loading) {
+        return "loading";
+    }
+    if (data && data.movie) {
+        return data.movie.title;
+    }
+}
