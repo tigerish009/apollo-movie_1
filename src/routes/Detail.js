@@ -1,20 +1,23 @@
-/* eslint-disable import/no-anonymous-default-export */
+import React from "react";
 import { useParams } from "react-router-dom";
 import { gql } from "apollo-boost";
 import { useQuery } from "@apollo/react-hooks";
 import styled from "styled-components";
 
-
-const GET_MOVIES = gql `
-    query getMovie($id: Int!) {
-        movie(id: $id) {
-            title
-            medium_cover_image
-            language
-            rating
-            description_intro
-        }
+const GET_MOVIE = gql`
+  query getMovie($id: Int!) {
+    movie(id: $id) {
+      title
+      medium_cover_image
+      language
+      rating
+      description_intro
     }
+    suggestions(id: $id) {
+      id
+      medium_cover_image
+    }
+  }
 `;
 
 const Container = styled.div`
@@ -55,27 +58,21 @@ const Poster = styled.div`
   background-position: center center;
 `;
 
-
-
 export default () => {
-    const { id } = useParams();
-    const { loading, data } = useQuery(GET_MOVIES, {variables: {id}});
-    return (
-        <Container>
-          <Column>
-            <Title>{loading ? "Loading..." : data.movie.title}</Title>
-            {!loading && data.movie && (
-            <>
-                <Subtitle>
-                {data.movie.language} · {data.movie.rating}
-                </Subtitle>
-                <Description>{data.movie.description_intro}</Description>
-            </>
-        )}
-          </Column>
-          <Poster
-            bg={data && data.movie ? data.movie.medium_cover_image : ""}
-          ></Poster>
-        </Container>
-      );
-}
+  const { id } = useParams();
+  const { loading, data } = useQuery(GET_MOVIE, {
+    variables: { id }
+  });
+  return (
+    <Container>
+      <Column>
+        <Title>{loading ? "Loading..." : data.movie.title}</Title>
+        <Subtitle>
+          {data?.movie?.language} · {data?.movie?.rating}
+        </Subtitle>
+        <Description>{data?.movie?.description_intro}</Description>
+      </Column>
+      <Poster bg={data?.movie?.medium_cover_image}></Poster>
+    </Container>
+  );
+};
